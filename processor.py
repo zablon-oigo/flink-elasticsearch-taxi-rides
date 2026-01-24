@@ -96,3 +96,11 @@ try:
         except Exception as e:
             logger.warning(f"Skipping malformed message: {e}")
             continue
+except KeyboardInterrupt:
+    logger.info("Shutdown signal received.")
+finally:
+    if counts:
+        logger.info("Flushing final partial window...")
+        producer.flush(timeout=5)
+    consumer.close()
+    logger.info("Kafka connections closed.")
