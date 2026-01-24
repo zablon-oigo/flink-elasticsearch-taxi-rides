@@ -19,3 +19,18 @@ KAFKA_CONFIG = {
 
 SOURCE_TOPIC = "taxi-rides"
 SINK_TOPIC = "taxi-metrics"
+WINDOW_SIZE_SEC = 10  
+consumer = Consumer(KAFKA_CONFIG)
+consumer.subscribe([SOURCE_TOPIC])
+producer = Producer({"bootstrap.servers": KAFKA_CONFIG["bootstrap.servers"]})
+
+def delivery_report(err, msg):
+    if err is not None:
+        logger.error(f"Delivery failed: {err}")
+    else:
+        logger.info(f"Metric sent to {msg.topic()} [Partition: {msg.partition()}]")
+
+window_start = time.time()
+counts = defaultdict(int)
+locations = defaultdict(dict)
+
